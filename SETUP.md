@@ -1,6 +1,6 @@
 # Quick Setup Guide
 
-This guide will help you get CaribX backend up and running in less than 5 minutes.
+This guide will help you get CaribEX backend up and running in less than 5 minutes.
 
 ## Prerequisites Checklist
 
@@ -107,10 +107,10 @@ make docker-down
 docker-compose logs -f api
 
 # Access database
-docker exec -it caribx-postgres psql -U postgres -d caribx
+docker exec -it CaribEX-postgres psql -U postgres -d CaribEX
 
 # Access Redis CLI
-docker exec -it caribx-redis redis-cli
+docker exec -it CaribEX-redis redis-cli
 ```
 
 ## Project Structure Quick Reference
@@ -182,7 +182,7 @@ echo "PORT=8081" >> .env
 docker ps | grep postgres
 
 # View PostgreSQL logs
-docker logs caribx-postgres
+docker logs CaribEX-postgres
 
 # Restart PostgreSQL
 docker-compose restart postgres
@@ -195,7 +195,7 @@ docker-compose restart postgres
 docker ps | grep redis
 
 # Test Redis connection
-docker exec caribx-redis redis-cli ping
+docker exec CaribEX-redis redis-cli ping
 # Should return: PONG
 ```
 
@@ -203,10 +203,10 @@ docker exec caribx-redis redis-cli ping
 
 ```bash
 # Check migration status
-migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/caribx?sslmode=disable" version
+migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/CaribEX?sslmode=disable" version
 
 # Force to a specific version (use with caution)
-migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/caribx?sslmode=disable" force 1
+migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/CaribEX?sslmode=disable" force 1
 ```
 
 ### Build Errors
@@ -258,7 +258,7 @@ Key environment variables (see `.env.example` for all options):
 | `PORT` | API server port | `8080` |
 | `DB_HOST` | PostgreSQL host | `localhost` |
 | `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_NAME` | Database name | `caribx` |
+| `DB_NAME` | Database name | `CaribEX` |
 | `REDIS_HOST` | Redis host | `localhost` |
 | `REDIS_PORT` | Redis port | `6379` |
 | `SESSION_SECRET` | Session encryption key | (change in production) |

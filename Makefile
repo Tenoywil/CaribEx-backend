@@ -1,10 +1,10 @@
-# CaribX Backend Makefile
+# CaribEX Backend Makefile
 
 .PHONY: help build test lint run-dev clean docker-build docker-up docker-down migrate-up migrate-down
 
 # Default target
 help:
-	@echo "CaribX Backend - Available targets:"
+	@echo "CaribEX Backend - Available targets:"
 	@echo "  build        - Build the API server binary"
 	@echo "  test         - Run tests"
 	@echo "  lint         - Run linters"
@@ -59,7 +59,7 @@ clean:
 # Build Docker image
 docker-build:
 	@echo "Building Docker image..."
-	@docker build -t caribx-backend:latest .
+	@docker build -t CaribEX-backend:latest .
 
 # Start Docker Compose services
 docker-up:
@@ -75,7 +75,7 @@ docker-down:
 migrate-up:
 	@echo "Running migrations up..."
 	@if command -v migrate > /dev/null; then \
-		migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/caribx?sslmode=disable" up; \
+		migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/CaribEX?sslmode=disable" up; \
 	else \
 		echo "migrate not installed. Install with: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest"; \
 	fi
@@ -84,7 +84,7 @@ migrate-up:
 migrate-down:
 	@echo "Running migrations down..."
 	@if command -v migrate > /dev/null; then \
-		migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/caribx?sslmode=disable" down; \
+		migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/CaribEX?sslmode=disable" down; \
 	else \
 		echo "migrate not installed. Install with: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest"; \
 	fi

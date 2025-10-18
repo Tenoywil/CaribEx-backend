@@ -1,4 +1,4 @@
-# CaribX Backend
+# CaribEX Backend
 
 [![Go Version](https://img.shields.io/badge/Go-1.23+-00ADD8?style=flat&logo=go)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -174,7 +174,7 @@ http://localhost:8080/v1
 
 ## 🏗️ Architecture
 
-CaribX follows **Domain-Driven Design (DDD)** principles with clean architecture:
+CaribEX follows **Domain-Driven Design (DDD)** principles with clean architecture:
 
 ### Layers
 
@@ -362,13 +362,13 @@ func TestUserRepository_Create(t *testing.T) {
 **Build image**:
 
 ```bash
-docker build -t caribx-backend:latest .
+docker build -t CaribEX-backend:latest .
 ```
 
 **Run container**:
 
 ```bash
-docker run -p 8080:8080 --env-file .env caribx-backend:latest
+docker run -p 8080:8080 --env-file .env CaribEX-backend:latest
 ```
 
 ### Docker Compose
@@ -389,14 +389,14 @@ Example deployment:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: caribx-backend
+  name: CaribEX-backend
 spec:
   replicas: 3
   template:
     spec:
       containers:
       - name: api
-        image: caribx-backend:latest
+        image: CaribEX-backend:latest
         ports:
         - containerPort: 8080
         env:
@@ -545,7 +545,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/Tenoywil/CaribEx-backend/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/Tenoywil/CaribEx-backend/discussions)
-- **Email**: support@caribx.io
+- **Email**: support@CaribEX.io
 
 ---
 

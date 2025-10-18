@@ -1,8 +1,8 @@
-# CaribX Backend - Project Summary
+# CaribEX Backend - Project Summary
 
 ## Overview
 
-This repository contains a complete, production-ready scaffold for the CaribX backend - a blockchain-backed money transfer and marketplace platform for Jamaica and the Caribbean.
+This repository contains a complete, production-ready scaffold for the CaribEX backend - a blockchain-backed money transfer and marketplace platform for Jamaica and the Caribbean.
 
 ## What Has Been Created
 

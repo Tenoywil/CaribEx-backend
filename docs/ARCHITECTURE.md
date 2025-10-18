@@ -1,8 +1,8 @@
-# CaribX Backend Architecture
+# CaribEX Backend Architecture
 
 ## Overview
 
-CaribX backend is built using **Domain-Driven Design (DDD)** principles with a clean architecture approach. The system is designed for high performance, security, and scalability, featuring a two-level caching strategy and comprehensive observability.
+CaribEX backend is built using **Domain-Driven Design (DDD)** principles with a clean architecture approach. The system is designed for high performance, security, and scalability, featuring a two-level caching strategy and comprehensive observability.
 
 ---
 
@@ -279,11 +279,11 @@ Client Response
 - **Gauges**: Cache size, connection pool size, goroutine count
 
 **Custom Metrics**:
-- `caribx_requests_total{method, path, status}`
-- `caribx_request_duration_seconds{method, path}`
-- `caribx_cache_hits_total{level}`
-- `caribx_cache_misses_total{level}`
-- `caribx_wallet_transactions_total{type, status}`
+- `CaribEX_requests_total{method, path, status}`
+- `CaribEX_request_duration_seconds{method, path}`
+- `CaribEX_cache_hits_total{level}`
+- `CaribEX_cache_misses_total{level}`
+- `CaribEX_wallet_transactions_total{type, status}`
 
 ### Tracing
 
@@ -398,12 +398,12 @@ See `migrations/000001_init_schema.up.sql` for the complete schema.
 
 **Build**:
 ```bash
-docker build -t caribx-backend:latest .
+docker build -t CaribEX-backend:latest .
 ```
 
 **Run**:
 ```bash
-docker run -p 8080:8080 --env-file .env caribx-backend:latest
+docker run -p 8080:8080 --env-file .env CaribEX-backend:latest
 ```
 
 ### Docker Compose

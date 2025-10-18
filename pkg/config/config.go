@@ -79,7 +79,7 @@ func Load() (*Config, error) {
 			Port:            getIntEnv("DB_PORT", 5432),
 			User:            getEnv("DB_USER", "postgres"),
 			Password:        getEnv("DB_PASSWORD", "postgres"),
-			Database:        getEnv("DB_NAME", "caribx"),
+			Database:        getEnv("DB_NAME", "CaribEX"),
 			MaxConnections:  getIntEnv("DB_MAX_CONNECTIONS", 25),
 			MaxIdleTime:     getDurationEnv("DB_MAX_IDLE_TIME", 15*time.Minute),
 			MaxConnLifetime: getDurationEnv("DB_MAX_CONN_LIFETIME", 1*time.Hour),

@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide provides detailed information for developers working on the CaribX backend.
+This guide provides detailed information for developers working on the CaribEX backend.
 
 ## Table of Contents
 
@@ -85,7 +85,7 @@ Settings (`.vscode/settings.json`):
 
 ### Domain-Driven Design
 
-CaribX follows DDD principles:
+CaribEX follows DDD principles:
 
 1. **Domain Layer** - Core business logic
    - Entities (User, Product, Order)

@@ -1,8 +1,8 @@
-# CaribX Backend API Documentation
+# CaribEX Backend API Documentation
 
 ## Overview
 
-CaribX is a blockchain-backed money transfer and marketplace platform for Jamaica and the Caribbean. This document describes the REST API endpoints available for integration.
+CaribEX is a blockchain-backed money transfer and marketplace platform for Jamaica and the Caribbean. This document describes the REST API endpoints available for integration.
 
 **Base URL**: `http://localhost:8080/v1`
 

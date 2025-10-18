@@ -1,6 +1,6 @@
-# CaribX — Backend Blueprint (Go 1.25.x)
+# CaribEX — Backend Blueprint (Go 1.25.x)
 
-**Project:** CaribX — Blockchain Money Transfer & Marketplace for Jamaica & the Caribbean
+**Project:** CaribEX — Blockchain Money Transfer & Marketplace for Jamaica & the Caribbean
 **Purpose:** Rapid, secure, hackathon-ready backend enabling P2P transfers, marketplace listings, wallet management, and order processing — built with DDD, strong security, and two-level caching.
 
 ---
@@ -276,8 +276,8 @@ Test cases (minimal list):
 
 ```bash
 # init module
-mkdir caribx-backend && cd caribx-backend
-go mod init github.com/<you>/caribx-backend
+mkdir CaribEX-backend && cd CaribEX-backend
+go mod init github.com/<you>/CaribEX-backend
 # install libs
 go get github.com/jackc/pgx/v5 github.com/spf13/viper github.com/go-redis/redis/v8 github.com/sony/gobreaker github.com/go-playground/validator/v10 github.com/rs/zerolog github.com/prometheus/client_golang golang.org/x/sync/singleflight github.com/stretchr/testify
 # create folders
@@ -286,7 +286,7 @@ mkdir -p cmd/internal/{domain,repository,usecase,controller,routes} pkg/{cache,c
 
 **AI/Copilot prompt (backend scaffolding):**
 
-> "Scaffold a Go 1.25 DDD backend for CaribX with pgxpool, Redis cache, SIWE auth endpoints, domain packages for user/product/cart/order/wallet, middleware chain (request-id, validator, rate-limit, auth), and Prometheus metrics. Create sample DTOs, a wallet debit/credit usecase, and unit tests for wallet logic."
+> "Scaffold a Go 1.25 DDD backend for CaribEX with pgxpool, Redis cache, SIWE auth endpoints, domain packages for user/product/cart/order/wallet, middleware chain (request-id, validator, rate-limit, auth), and Prometheus metrics. Create sample DTOs, a wallet debit/credit usecase, and unit tests for wallet logic."
 
 ---
 

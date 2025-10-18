@@ -31,11 +31,11 @@ COPY --from=builder /app/bin/api-server /app/api-server
 COPY --from=builder /app/migrations /app/migrations
 
 # Create non-root user
-RUN addgroup -g 1000 caribx && \
-    adduser -D -u 1000 -G caribx caribx && \
-    chown -R caribx:caribx /app
+RUN addgroup -g 1000 CaribEX && \
+    adduser -D -u 1000 -G CaribEX CaribEX && \
+    chown -R CaribEX:CaribEX /app
 
-USER caribx
+USER CaribEX
 
 # Expose port
 EXPOSE 8080

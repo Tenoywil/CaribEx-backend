@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	fmt.Println("CaribX Backend API Server")
+	fmt.Println("CaribEX Backend API Server")
 	fmt.Println("Version: 0.1.0")
 	
 	// TODO: Load configuration

@@ -3,11 +3,11 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: caribx-postgres
+    container_name: CaribEX-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: caribx
+      POSTGRES_DB: CaribEX
     ports:
       - "5432:5432"
     volumes:
@@ -21,7 +21,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: caribx-redis
+    container_name: CaribEX-redis
     ports:
       - "6379:6379"
     volumes:
@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: caribx-api
+    container_name: CaribEX-api
     ports:
       - "8080:8080"
     environment:
@@ -46,7 +46,7 @@ services:
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_NAME=caribx
+      - DB_NAME=CaribEX
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - SESSION_SECRET=dev-session-secret-change-in-prod

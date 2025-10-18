@@ -1,6 +1,6 @@
-# Contributing to CaribX Backend
+# Contributing to CaribEX Backend
 
-Thank you for your interest in contributing to CaribX! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to CaribEX! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -252,4 +252,4 @@ If you have questions:
 - Ask in [discussions](https://github.com/Tenoywil/CaribEx-backend/discussions)
 - Contact maintainers
 
-Thank you for contributing to CaribX! 🚀
+Thank you for contributing to CaribEX! 🚀
