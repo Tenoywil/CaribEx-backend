@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial project scaffolding with Domain-Driven Design structure
 - Domain models for User, Wallet, Product, Cart, and Order
 - PostgreSQL database schema with migrations
+- **Marketplace seed data migration with 40+ Caribbean-themed products**
+  - 8 seller accounts with wallet addresses and balances
+  - Products across all categories (Electronics, Fashion, Food & Beverages, etc.)
+  - Realistic Jamaican pricing and descriptions
+  - Ready-to-use test data for development
 - Docker and Docker Compose configuration
 - Configuration management with environment variables
 - Structured logging with zerolog
@@ -19,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Architecture guide (docs/ARCHITECTURE.md)
   - Development guide (docs/DEVELOPMENT.md)
   - Contributing guidelines (CONTRIBUTING.md)
+  - Migrations documentation (migrations/README.md)
 - Makefile with common development tasks
 - MIT License
 - README with project overview and quick start guide

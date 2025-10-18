@@ -47,7 +47,30 @@ curl http://localhost:8080/healthz
 
 You should see a health check response.
 
-**That's it! Your API is now running.** 🎉
+### 5. Explore the Seeded Marketplace Data
+
+The database comes pre-loaded with sample Caribbean marketplace products! 🏝️
+
+```bash
+# Browse all products
+curl http://localhost:8080/v1/products
+
+# Search for coffee
+curl "http://localhost:8080/v1/products?search=coffee"
+
+# Get all categories
+curl http://localhost:8080/v1/categories
+```
+
+**Sample data includes:**
+- 8 seller accounts with wallets
+- 40+ Caribbean-themed products
+- Products across all categories (Electronics, Fashion, Food & Beverages, etc.)
+- Realistic Jamaican pricing and descriptions
+
+See `migrations/README.md` for complete details on seeded data.
+
+**That's it! Your API is now running with sample data.** 🎉
 
 ## Quick Start (Local Development)
 

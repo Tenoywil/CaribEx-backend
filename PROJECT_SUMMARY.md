@@ -49,6 +49,7 @@ Complete PostgreSQL schema with:
 - Support for Row-Level Security (RLS)
 - UUID primary keys throughout
 - Audit timestamps (created_at, updated_at)
+- **Pre-seeded marketplace data** with 40+ Caribbean-themed products, 8 sellers, and sample wallets
 
 ### 🐳 Docker Configuration
 
@@ -77,7 +78,8 @@ Comprehensive documentation covering all aspects:
 5. **docs/DEVELOPMENT.md** - Detailed development guide
 6. **CONTRIBUTING.md** - Contribution guidelines
 7. **CHANGELOG.md** - Project history and versioning
-8. **LICENSE** - MIT License
+8. **migrations/README.md** - Database migrations and seed data guide
+9. **LICENSE** - MIT License
 
 ### 🛠️ Configuration & Infrastructure
 
