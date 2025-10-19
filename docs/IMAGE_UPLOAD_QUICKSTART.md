@@ -130,6 +130,101 @@ const createProductWithURLs = async (productData) => {
 - **Max Form Size**: 10MB
 - **Multiple Files**: Unlimited (within form size limit)
 
+## Product Listing Features
+
+### Pagination
+
+All list endpoints support pagination with validation:
+
+```javascript
+// Get page 2 with 50 items
+const response = await fetch('/v1/products?page=2&page_size=50');
+```
+
+- **page**: Page number (min: 1, default: 1)
+- **page_size**: Items per page (min: 1, max: 100, default: 20)
+
+### Sorting
+
+Products can be sorted by multiple fields:
+
+```javascript
+// Sort by price ascending
+const response = await fetch('/v1/products?sort_by=price&sort_order=asc');
+
+// Sort by newest first (default)
+const response = await fetch('/v1/products?sort_by=created_at&sort_order=desc');
+```
+
+**Available sort fields:**
+- `created_at` - When product was created (default)
+- `updated_at` - When product was last updated
+- `price` - Product price
+- `title` - Product title (alphabetical)
+
+**Sort order:**
+- `asc` - Ascending (lowest to highest)
+- `desc` - Descending (highest to lowest, default)
+
+### Filtering
+
+Combine filters for precise results:
+
+```javascript
+// Category filter
+const response = await fetch('/v1/products?category_id=123e4567-...');
+
+// Search filter
+const response = await fetch('/v1/products?search=coffee');
+
+// Combined: Search in category, sorted by price
+const response = await fetch('/v1/products?category_id=123e4567-...&search=premium&sort_by=price&sort_order=asc');
+```
+
+### Category Information
+
+Products now include full category details:
+
+```json
+{
+  "id": "550e8400-...",
+  "title": "Premium Coffee",
+  "category_id": "123e4567-...",
+  "category": {
+    "id": "123e4567-...",
+    "name": "Food & Beverages"
+  }
+}
+```
+
+### Complete Example
+
+```javascript
+// Fetch products with all options
+const fetchProducts = async (page = 1, categoryId = null) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    page_size: '20',
+    sort_by: 'created_at',
+    sort_order: 'desc'
+  });
+  
+  if (categoryId) {
+    params.append('category_id', categoryId);
+  }
+  
+  const response = await fetch(`/v1/products?${params}`);
+  const data = await response.json();
+  
+  return {
+    products: data.products,
+    total: data.total,
+    totalPages: data.total_pages,
+    currentPage: data.page
+  };
+};
+```
+
 ## Security Features
 
 - ✅ Authentication required for uploads
@@ -138,6 +233,7 @@ const createProductWithURLs = async (productData) => {
 - ✅ Filename sanitization (prevents path traversal)
 - ✅ Unique filenames (timestamp-based)
 - ✅ Public read-only bucket access
+- ✅ Pagination limits enforced (max 100 items per page)
 
 ## Workflow Options
 

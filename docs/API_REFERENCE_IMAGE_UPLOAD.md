@@ -216,14 +216,23 @@ Retrieve a paginated list of products with optional filters.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| page | integer | No | 1 | Page number |
-| page_size | integer | No | 20 | Items per page |
+| page | integer | No | 1 | Page number (min: 1) |
+| page_size | integer | No | 20 | Items per page (min: 1, max: 100) |
 | category_id | string | No | - | Filter by category UUID |
 | search | string | No | - | Search in title/description |
+| sort_by | string | No | created_at | Sort field: created_at, updated_at, price, title |
+| sort_order | string | No | desc | Sort order: asc, desc |
 
 **cURL Example:**
 ```bash
-curl -X GET "http://localhost:8080/v1/products?page=1&page_size=10&category_id=123e4567-e89b-12d3-a456-426614174000"
+# Basic list
+curl -X GET "http://localhost:8080/v1/products"
+
+# With filters and sorting
+curl -X GET "http://localhost:8080/v1/products?page=1&page_size=10&category_id=123e4567-e89b-12d3-a456-426614174000&sort_by=price&sort_order=asc"
+
+# Search by keyword
+curl -X GET "http://localhost:8080/v1/products?search=coffee&sort_by=created_at&sort_order=desc"
 ```
 
 **Success Response (200 OK):**
@@ -241,6 +250,10 @@ curl -X GET "http://localhost:8080/v1/products?page=1&page_size=10&category_id=1
         "https://your-project.supabase.co/storage/.../image.jpg"
       ],
       "category_id": "123e4567-e89b-12d3-a456-426614174000",
+      "category": {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "name": "Food & Beverages"
+      },
       "is_active": true,
       "created_at": "2025-10-19T12:30:00Z",
       "updated_at": "2025-10-19T12:30:00Z"
@@ -252,6 +265,13 @@ curl -X GET "http://localhost:8080/v1/products?page=1&page_size=10&category_id=1
   "total_pages": 5
 }
 ```
+
+**Notes:**
+- Products now include nested `category` object with `id` and `name`
+- Sorting is case-insensitive
+- Invalid sort fields default to `created_at DESC`
+- Page size is capped at 100 items
+- Search is case-insensitive and searches both title and description
 
 ---
 
@@ -287,11 +307,19 @@ curl -X GET http://localhost:8080/v1/products/550e8400-e29b-41d4-a716-4466554400
     "https://your-project.supabase.co/storage/.../image.jpg"
   ],
   "category_id": "123e4567-e89b-12d3-a456-426614174000",
+  "category": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "Food & Beverages"
+  },
   "is_active": true,
   "created_at": "2025-10-19T12:30:00Z",
   "updated_at": "2025-10-19T12:30:00Z"
 }
 ```
+
+**Notes:**
+- Product includes nested `category` object with full details
+- Category is null if the product has no category assigned
 
 **Error Response (404 Not Found):**
 ```json
