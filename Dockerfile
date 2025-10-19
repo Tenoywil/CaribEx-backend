@@ -1,48 +1,54 @@
-# Build stage
+# Build stage - use stable Go version with Alpine for smaller size
 FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
 
 # Install build dependencies
-RUN apk add --no-cache git make
+RUN apk add --no-cache git ca-certificates tzdata make
 
-# Copy go mod files
+# Copy dependency files first for better layer caching
 COPY go.mod go.sum ./
-RUN go mod download
+
+# Download and verify dependencies
+RUN go mod download && go mod verify
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN make build
+# Build the application with optimizations
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+  -ldflags='-w -s -extldflags "-static"' \
+  -a -installsuffix cgo \
+  -tags netgo \
+  -o caribex-backend ./cmd/api-server/main.go
 
-# Runtime stage
-FROM alpine:latest
+# Runtime stage - use distroless for security and minimal size
+FROM gcr.io/distroless/static-debian12:nonroot
 
 WORKDIR /app
 
-# Install runtime dependencies
-RUN apk add --no-cache ca-certificates tzdata
-
-# Copy binary from builder
-COPY --from=builder /app/bin/api-server /app/api-server
+# Copy the binary from builder stage
+COPY --from=builder /app/caribex-backend /app/caribex-backend
 
 # Copy migrations
 COPY --from=builder /app/migrations /app/migrations
 
-# Create non-root user
-RUN addgroup -g 1000 CaribEX && \
-    adduser -D -u 1000 -G CaribEX CaribEX && \
-    chown -R CaribEX:CaribEX /app
+# Copy timezone data for proper time handling
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
-USER CaribEX
+# Use non-root user for security (already set in base image)
+USER nonroot:nonroot
 
-# Expose port
+# Expose the application port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/healthz || exit 1
+# Set environment variables
+ENV TZ=UTC
+ENV GIN_MODE=release
+
+# Health check for container orchestration
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD ["/app/caribex-backend", "--health"] || exit 1
 
 # Run the application
-CMD ["/app/api-server"]
+ENTRYPOINT ["/app/caribex-backend"]
