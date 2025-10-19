@@ -20,6 +20,11 @@ import (
 	"github.com/Tenoywil/CaribEx-backend/pkg/logger"
 	"github.com/Tenoywil/CaribEx-backend/pkg/middleware"
 	"github.com/Tenoywil/CaribEx-backend/pkg/storage"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	redisclient "github.com/redis/go-redis/v9"
@@ -111,6 +116,34 @@ func main() {
 		os.Exit(1)
 	}
 	appLogger.Info("Storage service initialized")
+
+	// Initialize S3-compatible uploader for Supabase Storage
+	var s3Service *storage.S3Service
+	if cfg.SupabaseS3AccessKeyID != "" && cfg.SupabaseS3SecretAccessKey != "" {
+		appLogger.Info("Initializing S3-compatible storage for Supabase")
+
+		sess, err := session.NewSession(&aws.Config{
+			Region:           aws.String(cfg.SupabaseRegion),
+			Credentials:      credentials.NewStaticCredentials(cfg.SupabaseS3AccessKeyID, cfg.SupabaseS3SecretAccessKey, ""),
+			Endpoint:         aws.String(cfg.SupabaseStorageURL),
+			S3ForcePathStyle: aws.Bool(true),
+		})
+		if err != nil {
+			appLogger.Error(err, "Failed to create S3 session")
+			os.Exit(1)
+		}
+
+		s3Uploader := s3manager.NewUploader(sess)
+		s3Client := s3.New(sess)
+		s3Service = storage.NewS3Service(s3Uploader, s3Client, cfg.SupabaseBucket)
+
+		appLogger.Info("S3-compatible storage initialized successfully")
+	} else {
+		appLogger.Info("S3 credentials not configured - file uploads will use basic storage service")
+	}
+
+	// S3Service is now available for use in controllers
+	_ = s3Service // TODO: Pass to controllers that need file upload functionality
 
 	// Initialize use cases
 	userUseCase := usecase.NewUserUseCase(userRepo)

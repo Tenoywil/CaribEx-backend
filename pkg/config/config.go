@@ -54,6 +54,13 @@ type Config struct {
 	SupabaseKey        string `mapstructure:"SUPABASE_KEY"`
 	SupabaseBucket     string `mapstructure:"SUPABASE_BUCKET"`
 	StorageMaxFileSize int64  `mapstructure:"STORAGE_MAX_FILE_SIZE"`
+
+	// S3-Compatible Storage Configuration (for Supabase/MinIO/AWS S3)
+	SupabaseS3AccessKeyID     string `mapstructure:"SUPABASE_S3_ACCESS_KEY_ID"`
+	SupabaseS3SecretAccessKey string `mapstructure:"SUPABASE_S3_SECRET_ACCESS_KEY"`
+	SupabaseStorageURL        string `mapstructure:"SUPABASE_STORAGE_URL"`
+	SupabaseRegion            string `mapstructure:"SUPABASE_REGION"`
+
 	// Blockchain Configuration
 	RPCURL string `mapstructure:"RPC_URL"`
 
@@ -141,6 +148,13 @@ func loadEnvFromOS(cfg *Config) {
 	cfg.SupabaseURL = os.Getenv("SUPABASE_URL")
 	cfg.SupabaseKey = os.Getenv("SUPABASE_KEY")
 	cfg.SupabaseBucket = os.Getenv("SUPABASE_BUCKET")
+	cfg.StorageMaxFileSize = getenvInt64("STORAGE_MAX_FILE_SIZE")
+
+	// S3-Compatible Storage Configuration
+	cfg.SupabaseS3AccessKeyID = os.Getenv("SUPABASE_S3_ACCESS_KEY_ID")
+	cfg.SupabaseS3SecretAccessKey = os.Getenv("SUPABASE_S3_SECRET_ACCESS_KEY")
+	cfg.SupabaseStorageURL = os.Getenv("SUPABASE_STORAGE_URL")
+	cfg.SupabaseRegion = os.Getenv("SUPABASE_REGION")
 	cfg.StorageMaxFileSize = getenvInt64("STORAGE_MAX_FILE_SIZE")
 	// Blockchain Configuration
 	cfg.RPCURL = os.Getenv("RPC_URL")
