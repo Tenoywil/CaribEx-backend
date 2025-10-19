@@ -1,171 +1,185 @@
 package config
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"strconv"
-	"time"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
 // Config holds all configuration for the application
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	Redis    RedisConfig
-	Auth     AuthConfig
-	Cache    CacheConfig
-}
+	// Environment
+	AppEnv string `mapstructure:"ENV"`
 
-// ServerConfig holds server configuration
-type ServerConfig struct {
-	Port            string
-	Host            string
-	ReadTimeout     time.Duration
-	WriteTimeout    time.Duration
-	ShutdownTimeout time.Duration
-	AllowedOrigins  []string
-}
+	// Server Configuration
+	ServerPort            string `mapstructure:"PORT"`
+	ServerHost            string `mapstructure:"HOST"`
+	ServerReadTimeout     string `mapstructure:"SERVER_READ_TIMEOUT"`
+	ServerWriteTimeout    string `mapstructure:"SERVER_WRITE_TIMEOUT"`
+	ServerShutdownTimeout string `mapstructure:"SERVER_SHUTDOWN_TIMEOUT"`
+	AllowedOrigins        string `mapstructure:"ALLOWED_ORIGINS"`
 
-// DatabaseConfig holds database configuration
-type DatabaseConfig struct {
-	Host            string
-	Port            int
-	User            string
-	Password        string
-	Database        string
-	MaxConnections  int
-	MaxIdleTime     time.Duration
-	MaxConnLifetime time.Duration
-}
+	// Database Configuration
+	DBConnectionString string `mapstructure:"DB_CONNECTION_STRING"`
+	DBMaxConnections   int    `mapstructure:"DB_MAX_CONNECTIONS"`
+	DBMaxIdleTime      string `mapstructure:"DB_MAX_IDLE_TIME"`
+	DBMaxConnLifetime  string `mapstructure:"DB_MAX_CONN_LIFETIME"`
 
-// RedisConfig holds Redis configuration
-type RedisConfig struct {
-	Host     string
-	Port     int
-	Password string
-	DB       int
-}
+	// Redis Configuration
+	RedisConnectionString string `mapstructure:"REDIS_CONNECTION_STRING"`
+	RedisHost             string `mapstructure:"REDIS_HOST"`
+	RedisPort             int    `mapstructure:"REDIS_PORT"`
+	RedisPassword         string `mapstructure:"REDIS_PASSWORD"`
+	RedisDB               int    `mapstructure:"REDIS_DB"`
 
-// AuthConfig holds authentication configuration
-type AuthConfig struct {
-	SessionSecret   string
-	SessionDuration time.Duration
-	JWTSecret       string
-	JWTExpiration   time.Duration
-}
+	// Authentication Configuration
+	SessionSecret   string `mapstructure:"SESSION_SECRET"`
+	SessionDuration string `mapstructure:"SESSION_DURATION"`
+	JWTSecret       string `mapstructure:"JWT_SECRET"`
+	JWTExpiration   string `mapstructure:"JWT_EXPIRATION"`
+	SIWEDomain      string `mapstructure:"SIWE_DOMAIN"`
 
-// CacheConfig holds cache configuration
-type CacheConfig struct {
-	L1MaxSize     int64
-	L1TTL         time.Duration
-	L2TTL         time.Duration
-	EnableL1      bool
-	EnableL2      bool
+	// Cache Configuration
+	CacheEnableL1  bool   `mapstructure:"CACHE_ENABLE_L1"`
+	CacheEnableL2  bool   `mapstructure:"CACHE_ENABLE_L2"`
+	CacheL1MaxSize int64  `mapstructure:"CACHE_L1_MAX_SIZE"`
+	CacheL1TTL     string `mapstructure:"CACHE_L1_TTL"`
+	CacheL2TTL     string `mapstructure:"CACHE_L2_TTL"`
+
+	// Parsed values
+	AllowedOriginsSlice []string
 }
 
 // Load loads configuration from environment variables
-func Load() (*Config, error) {
-	cfg := &Config{
-		Server: ServerConfig{
-			Port:            getEnv("PORT", "8080"),
-			Host:            getEnv("HOST", "0.0.0.0"),
-			ReadTimeout:     getDurationEnv("SERVER_READ_TIMEOUT", 10*time.Second),
-			WriteTimeout:    getDurationEnv("SERVER_WRITE_TIMEOUT", 10*time.Second),
-			ShutdownTimeout: getDurationEnv("SERVER_SHUTDOWN_TIMEOUT", 30*time.Second),
-			AllowedOrigins:  []string{getEnv("ALLOWED_ORIGIN", "http://localhost:3000")},
-		},
-		Database: DatabaseConfig{
-			Host:            getEnv("DB_HOST", "localhost"),
-			Port:            getIntEnv("DB_PORT", 5432),
-			User:            getEnv("DB_USER", "postgres"),
-			Password:        getEnv("DB_PASSWORD", "postgres"),
-			Database:        getEnv("DB_NAME", "CaribEX"),
-			MaxConnections:  getIntEnv("DB_MAX_CONNECTIONS", 25),
-			MaxIdleTime:     getDurationEnv("DB_MAX_IDLE_TIME", 15*time.Minute),
-			MaxConnLifetime: getDurationEnv("DB_MAX_CONN_LIFETIME", 1*time.Hour),
-		},
-		Redis: RedisConfig{
-			Host:     getEnv("REDIS_HOST", "localhost"),
-			Port:     getIntEnv("REDIS_PORT", 6379),
-			Password: getEnv("REDIS_PASSWORD", ""),
-			DB:       getIntEnv("REDIS_DB", 0),
-		},
-		Auth: AuthConfig{
-			SessionSecret:   getEnv("SESSION_SECRET", "change-me-in-production"),
-			SessionDuration: getDurationEnv("SESSION_DURATION", 24*time.Hour),
-			JWTSecret:       getEnv("JWT_SECRET", "change-me-in-production"),
-			JWTExpiration:   getDurationEnv("JWT_EXPIRATION", 1*time.Hour),
-		},
-		Cache: CacheConfig{
-			L1MaxSize:     getInt64Env("CACHE_L1_MAX_SIZE", 100*1024*1024), // 100MB
-			L1TTL:         getDurationEnv("CACHE_L1_TTL", 5*time.Minute),
-			L2TTL:         getDurationEnv("CACHE_L2_TTL", 15*time.Minute),
-			EnableL1:      getBoolEnv("CACHE_ENABLE_L1", true),
-			EnableL2:      getBoolEnv("CACHE_ENABLE_L2", true),
-		},
+func Load() *Config {
+	cfg := &Config{}
+
+	// Try to read from .env first (dev/local). If not found and running in production, fall back to OS env.
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		if os.Getenv("ENV") == "production" {
+			loadEnvFromOS(cfg)
+			return cfg
+		}
+		log.Fatal("Can't find the file .env : ", err)
 	}
 
-	if err := cfg.Validate(); err != nil {
-		return nil, err
+	if err := viper.Unmarshal(cfg); err != nil {
+		if os.Getenv("ENV") == "production" {
+			loadEnvFromOS(cfg)
+			return cfg
+		}
+		log.Fatal("Environment can't be loaded: ", err)
 	}
 
-	return cfg, nil
+	// If the loaded configuration indicates production, prefer OS env (e.g., when .env exists but prod uses env vars)
+	switch cfg.AppEnv {
+	case "production":
+		loadEnvFromOS(cfg)
+	case "development":
+		log.Println("The App is running in development env")
+	}
+
+	// Parse allowed origins into slice
+	cfg.AllowedOriginsSlice = allowedOriginSlice(cfg.AllowedOrigins)
+	log.Printf("[CONFIG] Loaded ALLOWED_ORIGINS: %s", cfg.AllowedOrigins)
+	log.Printf("[CONFIG] Parsed AllowedOriginsSlice: %v", cfg.AllowedOriginsSlice)
+
+	return cfg
 }
 
-// Validate validates the configuration
-func (c *Config) Validate() error {
-	if c.Server.Port == "" {
-		return fmt.Errorf("server port is required")
-	}
-	if c.Database.Host == "" {
-		return fmt.Errorf("database host is required")
-	}
-	if c.Auth.SessionSecret == "change-me-in-production" && os.Getenv("ENV") == "production" {
-		return fmt.Errorf("session secret must be set in production")
-	}
-	return nil
+func loadEnvFromOS(cfg *Config) {
+	cfg.AppEnv = os.Getenv("ENV")
+
+	// Server Configuration
+	cfg.ServerPort = os.Getenv("PORT")
+	cfg.ServerHost = os.Getenv("HOST")
+	cfg.ServerReadTimeout = os.Getenv("SERVER_READ_TIMEOUT")
+	cfg.ServerWriteTimeout = os.Getenv("SERVER_WRITE_TIMEOUT")
+	cfg.ServerShutdownTimeout = os.Getenv("SERVER_SHUTDOWN_TIMEOUT")
+	cfg.AllowedOrigins = os.Getenv("ALLOWED_ORIGINS")
+
+	// Database Configuration
+	cfg.DBConnectionString = os.Getenv("DB_CONNECTION_STRING")
+	cfg.DBMaxConnections = getenvInt("DB_MAX_CONNECTIONS")
+	cfg.DBMaxIdleTime = os.Getenv("DB_MAX_IDLE_TIME")
+	cfg.DBMaxConnLifetime = os.Getenv("DB_MAX_CONN_LIFETIME")
+
+	// Redis Configuration
+	cfg.RedisConnectionString = os.Getenv("REDIS_CONNECTION_STRING")
+	cfg.RedisHost = os.Getenv("REDIS_HOST")
+	cfg.RedisPort = getenvInt("REDIS_PORT")
+	cfg.RedisPassword = os.Getenv("REDIS_PASSWORD")
+	cfg.RedisDB = getenvInt("REDIS_DB")
+
+	// Authentication Configuration
+	cfg.SessionSecret = os.Getenv("SESSION_SECRET")
+	cfg.SessionDuration = os.Getenv("SESSION_DURATION")
+	cfg.JWTSecret = os.Getenv("JWT_SECRET")
+	cfg.JWTExpiration = os.Getenv("JWT_EXPIRATION")
+	cfg.SIWEDomain = os.Getenv("SIWE_DOMAIN")
+
+	// Cache Configuration
+	cfg.CacheEnableL1 = getenvBool("CACHE_ENABLE_L1")
+	cfg.CacheEnableL2 = getenvBool("CACHE_ENABLE_L2")
+	cfg.CacheL1MaxSize = getenvInt64("CACHE_L1_MAX_SIZE")
+	cfg.CacheL1TTL = os.Getenv("CACHE_L1_TTL")
+	cfg.CacheL2TTL = os.Getenv("CACHE_L2_TTL")
+
+	// Parse allowed origins into slice
+	cfg.AllowedOriginsSlice = allowedOriginSlice(cfg.AllowedOrigins)
 }
 
-// Helper functions to get environment variables with defaults
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
+func getenvInt(key string) int {
+	v := os.Getenv(key)
+	if v == "" {
+		return 0
 	}
-	return defaultValue
+	i, err := strconv.Atoi(v)
+	if err != nil {
+		return 0
+	}
+	return i
 }
 
-func getIntEnv(key string, defaultValue int) int {
-	if value := os.Getenv(key); value != "" {
-		if intVal, err := strconv.Atoi(value); err == nil {
-			return intVal
+func getenvInt64(key string) int64 {
+	v := os.Getenv(key)
+	if v == "" {
+		return 0
+	}
+	i, err := strconv.ParseInt(v, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return i
+}
+
+func getenvBool(key string) bool {
+	v := os.Getenv(key)
+	if v == "" {
+		return false
+	}
+	b, err := strconv.ParseBool(v)
+	if err != nil {
+		return false
+	}
+	return b
+}
+
+func allowedOriginSlice(origins string) []string {
+	if origins == "" {
+		log.Println("[CONFIG] WARNING: ALLOWED_ORIGINS is empty! CORS will not work properly.")
+		return []string{}
+	}
+	var result []string
+	for _, origin := range strings.Split(origins, ",") {
+		trimmed := strings.TrimSpace(origin)
+		if trimmed != "" {
+			result = append(result, trimmed)
 		}
 	}
-	return defaultValue
-}
-
-func getInt64Env(key string, defaultValue int64) int64 {
-	if value := os.Getenv(key); value != "" {
-		if intVal, err := strconv.ParseInt(value, 10, 64); err == nil {
-			return intVal
-		}
-	}
-	return defaultValue
-}
-
-func getBoolEnv(key string, defaultValue bool) bool {
-	if value := os.Getenv(key); value != "" {
-		if boolVal, err := strconv.ParseBool(value); err == nil {
-			return boolVal
-		}
-	}
-	return defaultValue
-}
-
-func getDurationEnv(key string, defaultValue time.Duration) time.Duration {
-	if value := os.Getenv(key); value != "" {
-		if duration, err := time.ParseDuration(value); err == nil {
-			return duration
-		}
-	}
-	return defaultValue
+	return result
 }

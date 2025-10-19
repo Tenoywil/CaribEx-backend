@@ -1,3 +1,4 @@
+-- Active: 1760838300877@@aws-1-us-east-2.pooler.supabase.com@5432@postgres
 -- Drop tables in reverse order due to foreign key constraints
 DROP TABLE IF EXISTS refresh_tokens;
 DROP TABLE IF EXISTS order_items;
