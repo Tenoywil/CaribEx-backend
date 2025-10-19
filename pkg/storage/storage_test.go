@@ -208,9 +208,11 @@ func createMockFile(t *testing.T, filename, contentType string, content []byte) 
 		t.Fatal(err)
 	}
 
+	// Store boundary before closing writer
+	boundary := writer.Boundary()
 	writer.Close()
 
-	reader := multipart.NewReader(body, writer.Boundary())
+	reader := multipart.NewReader(body, boundary)
 	form, err := reader.ReadForm(int64(len(content)) + 1024)
 	if err != nil {
 		t.Fatal(err)
@@ -273,7 +275,7 @@ func TestUploadFile_ContentTypeValidation(t *testing.T) {
 			file, header := createMockFile(t, "test.jpg", tt.contentType, content)
 			defer file.Close()
 
-			// Should fail at content type validation before actual upload
+			// Tests the full validation flow including content type checking
 			_, err := storage.UploadFile(nil, file, header, "test")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UploadFile() with %s error = %v, wantErr %v", tt.contentType, err, tt.wantErr)
