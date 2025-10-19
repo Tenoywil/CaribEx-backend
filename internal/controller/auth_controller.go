@@ -108,9 +108,14 @@ func (c *AuthController) GetMe(ctx *gin.Context) {
 
 	walletAddress, _ := ctx.Get("wallet_address")
 
+	session, _ := ctx.Get("session") // assuming session info is set in context by middleware
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"user_id":        userID,
-		"wallet_address": walletAddress,
+		"user": gin.H{
+			"id":            userID,
+			"wallet_address": walletAddress,
+		},
+		"session": session, // session should be a map or struct with fields like expiredAt, etc.
 	})
 }
 
