@@ -2,6 +2,7 @@ package storage
 
 import (
 	"bytes"
+	"context"
 	"mime/multipart"
 	"net/textproto"
 	"testing"
@@ -245,7 +246,7 @@ func TestUploadFile_FileSizeValidation(t *testing.T) {
 	defer file.Close()
 
 	// This should fail due to size
-	_, err := storage.UploadFile(nil, file, header, "test")
+	_, err := storage.UploadFile(context.TODO(), file, header, "test")
 	if err == nil {
 		t.Error("UploadFile() should fail for oversized file")
 	}
@@ -276,7 +277,7 @@ func TestUploadFile_ContentTypeValidation(t *testing.T) {
 			defer file.Close()
 
 			// Tests the full validation flow including content type checking
-			_, err := storage.UploadFile(nil, file, header, "test")
+			_, err := storage.UploadFile(context.TODO(), file, header, "test")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UploadFile() with %s error = %v, wantErr %v", tt.contentType, err, tt.wantErr)
 			}
