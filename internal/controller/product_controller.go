@@ -57,7 +57,7 @@ func (c *ProductController) CreateProduct(ctx *gin.Context) {
 func (c *ProductController) GetProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	p, err := c.productUseCase.GetProductByID(id)
+	p, err := c.productUseCase.GetProductByIDWithCategory(id)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
 		return
@@ -70,6 +70,17 @@ func (c *ProductController) GetProduct(ctx *gin.Context) {
 func (c *ProductController) ListProducts(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("page_size", "20"))
+	
+	// Ensure page and pageSize are within valid ranges
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 20
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
 
 	filters := make(map[string]interface{})
 	if categoryID := ctx.Query("category_id"); categoryID != "" {
@@ -78,18 +89,22 @@ func (c *ProductController) ListProducts(ctx *gin.Context) {
 	if search := ctx.Query("search"); search != "" {
 		filters["search"] = search
 	}
+	
+	// Get sort parameters
+	sortBy := ctx.DefaultQuery("sort_by", "created_at")
+	sortOrder := ctx.DefaultQuery("sort_order", "desc")
 
-	products, total, err := c.productUseCase.ListProducts(filters, page, pageSize)
+	products, total, err := c.productUseCase.ListProductsWithCategory(filters, page, pageSize, sortBy, sortOrder)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"products":   products,
-		"total":      total,
-		"page":       page,
-		"page_size":  pageSize,
+		"products":    products,
+		"total":       total,
+		"page":        page,
+		"page_size":   pageSize,
 		"total_pages": (total + pageSize - 1) / pageSize,
 	})
 }

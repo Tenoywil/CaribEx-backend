@@ -46,9 +46,19 @@ func (uc *ProductUseCase) GetProductByID(id string) (*product.Product, error) {
 	return uc.productRepo.GetByID(id)
 }
 
+// GetProductByIDWithCategory retrieves a product by ID with category details
+func (uc *ProductUseCase) GetProductByIDWithCategory(id string) (*product.ProductWithCategory, error) {
+	return uc.productRepo.GetByIDWithCategory(id)
+}
+
 // ListProducts retrieves a list of products with filters
 func (uc *ProductUseCase) ListProducts(filters map[string]interface{}, page, pageSize int) ([]*product.Product, int, error) {
 	return uc.productRepo.List(filters, page, pageSize)
+}
+
+// ListProductsWithCategory retrieves a list of products with category details and sorting
+func (uc *ProductUseCase) ListProductsWithCategory(filters map[string]interface{}, page, pageSize int, sortBy, sortOrder string) ([]*product.ProductWithCategory, int, error) {
+	return uc.productRepo.ListWithCategory(filters, page, pageSize, sortBy, sortOrder)
 }
 
 // UpdateProduct updates product information
