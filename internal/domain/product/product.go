@@ -1,6 +1,15 @@
 package product
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+// Error definitions
+var (
+	ErrProductNotFound     = errors.New("product not found")
+	ErrInvalidQuantity     = errors.New("quantity cannot be negative")
+)
 
 // Product represents a marketplace product listing
 type Product struct {

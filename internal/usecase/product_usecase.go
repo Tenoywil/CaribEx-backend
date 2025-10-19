@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Tenoywil/CaribEx-backend/internal/domain/product"
@@ -72,13 +71,13 @@ func (uc *ProductUseCase) UpdateProduct(p *product.Product) error {
 func (uc *ProductUseCase) UpdateProductQuantity(id string, quantity int) error {
 	// Validate quantity is not negative
 	if quantity < 0 {
-		return fmt.Errorf("quantity cannot be negative")
+		return product.ErrInvalidQuantity
 	}
 	
 	// Verify product exists
 	_, err := uc.productRepo.GetByID(id)
 	if err != nil {
-		return fmt.Errorf("product not found: %w", err)
+		return product.ErrProductNotFound
 	}
 	
 	return uc.productRepo.UpdateQuantity(id, quantity)

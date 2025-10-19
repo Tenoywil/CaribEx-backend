@@ -238,10 +238,10 @@ func (r *productRepository) Update(p *product.Product) error {
 func (r *productRepository) UpdateQuantity(id string, quantity int) error {
 	query := `
 		UPDATE products 
-		SET quantity = $1, updated_at = $2
-		WHERE id = $3
+		SET quantity = $1, updated_at = NOW()
+		WHERE id = $2
 	`
-	_, err := r.db.Exec(context.Background(), query, quantity, "now()", id)
+	_, err := r.db.Exec(context.Background(), query, quantity, id)
 	return err
 }
 

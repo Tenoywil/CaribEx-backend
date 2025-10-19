@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/Tenoywil/CaribEx-backend/internal/domain/product"
 	"github.com/Tenoywil/CaribEx-backend/internal/usecase"
 	"github.com/Tenoywil/CaribEx-backend/pkg/storage"
 	"github.com/gin-gonic/gin"
@@ -153,22 +155,23 @@ func (c *ProductController) UpdateProductQuantity(ctx *gin.Context) {
 
 	err := c.productUseCase.UpdateProductQuantity(id, req.Quantity)
 	if err != nil {
-		if err.Error() == "product not found" || err.Error() == "failed to get product by id: no rows in result set" {
+		if errors.Is(err, product.ErrProductNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
+			return
+		}
+		if errors.Is(err, product.ErrInvalidQuantity) {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Get updated product to return
-	p, err := c.productUseCase.GetProductByID(id)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve updated product"})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, p)
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Product quantity updated successfully",
+		"product_id": id,
+		"quantity": req.Quantity,
+	})
 }
 
 // DeleteProduct handles DELETE /products/:id

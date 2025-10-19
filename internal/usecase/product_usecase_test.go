@@ -97,7 +97,7 @@ func TestUpdateProductQuantity_NegativeQuantity(t *testing.T) {
 	err := uc.UpdateProductQuantity(productID, negativeQuantity)
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "quantity cannot be negative")
+	assert.Equal(t, product.ErrInvalidQuantity, err)
 	mockRepo.AssertNotCalled(t, "GetByID")
 	mockRepo.AssertNotCalled(t, "UpdateQuantity")
 }
@@ -110,12 +110,12 @@ func TestUpdateProductQuantity_ProductNotFound(t *testing.T) {
 	newQuantity := 50
 
 	// Mock product not found
-	mockRepo.On("GetByID", productID).Return(nil, errors.New("product not found"))
+	mockRepo.On("GetByID", productID).Return(nil, errors.New("not found"))
 
 	err := uc.UpdateProductQuantity(productID, newQuantity)
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "product not found")
+	assert.Equal(t, product.ErrProductNotFound, err)
 	mockRepo.AssertExpectations(t)
 	mockRepo.AssertNotCalled(t, "UpdateQuantity")
 }
