@@ -73,13 +73,13 @@ func (uc *ProductUseCase) UpdateProductQuantity(id string, quantity int) error {
 	if quantity < 0 {
 		return product.ErrInvalidQuantity
 	}
-	
+
 	// Verify product exists
 	_, err := uc.productRepo.GetByID(id)
 	if err != nil {
 		return product.ErrProductNotFound
 	}
-	
+
 	return uc.productRepo.UpdateQuantity(id, quantity)
 }
 

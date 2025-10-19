@@ -52,15 +52,15 @@ func (r *productRepository) GetByIDWithCategory(id string) (*product.ProductWith
 	`
 	var p product.ProductWithCategory
 	var categoryID, categoryName *string
-	
+
 	err := r.db.QueryRow(context.Background(), query, id).Scan(
-		&p.ID, &p.SellerID, &p.Title, &p.Description, &p.Price, &p.Quantity, &p.Images, 
+		&p.ID, &p.SellerID, &p.Title, &p.Description, &p.Price, &p.Quantity, &p.Images,
 		&p.CategoryID, &p.IsActive, &p.CreatedAt, &p.UpdatedAt,
 		&categoryID, &categoryName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get product by id: %w", err)
 	}
-	
+
 	// Set category if it exists
 	if categoryID != nil && categoryName != nil {
 		p.Category = &product.Category{
@@ -68,7 +68,7 @@ func (r *productRepository) GetByIDWithCategory(id string) (*product.ProductWith
 			Name: *categoryName,
 		}
 	}
-	
+
 	return &p, nil
 }
 
@@ -167,7 +167,7 @@ func (r *productRepository) ListWithCategory(filters map[string]interface{}, pag
 		"price":      "p.price",
 		"title":      "p.title",
 	}
-	
+
 	if sortBy != "" {
 		if dbField, ok := validSortFields[sortBy]; ok {
 			order := "DESC"
@@ -201,15 +201,15 @@ func (r *productRepository) ListWithCategory(filters map[string]interface{}, pag
 	for rows.Next() {
 		var p product.ProductWithCategory
 		var categoryID, categoryName *string
-		
+
 		err := rows.Scan(
-			&p.ID, &p.SellerID, &p.Title, &p.Description, &p.Price, &p.Quantity, &p.Images, 
+			&p.ID, &p.SellerID, &p.Title, &p.Description, &p.Price, &p.Quantity, &p.Images,
 			&p.CategoryID, &p.IsActive, &p.CreatedAt, &p.UpdatedAt,
 			&categoryID, &categoryName)
 		if err != nil {
 			return nil, 0, fmt.Errorf("failed to scan product: %w", err)
 		}
-		
+
 		// Set category if it exists
 		if categoryID != nil && categoryName != nil {
 			p.Category = &product.Category{
@@ -217,7 +217,7 @@ func (r *productRepository) ListWithCategory(filters map[string]interface{}, pag
 				Name: *categoryName,
 			}
 		}
-		
+
 		products = append(products, &p)
 	}
 

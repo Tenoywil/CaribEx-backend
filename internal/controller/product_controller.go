@@ -72,7 +72,7 @@ func (c *ProductController) GetProduct(ctx *gin.Context) {
 func (c *ProductController) ListProducts(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("page_size", "20"))
-	
+
 	// Ensure page and pageSize are within valid ranges
 	if page < 1 {
 		page = 1
@@ -91,7 +91,7 @@ func (c *ProductController) ListProducts(ctx *gin.Context) {
 	if search := ctx.Query("search"); search != "" {
 		filters["search"] = search
 	}
-	
+
 	// Get sort parameters
 	sortBy := ctx.DefaultQuery("sort_by", "created_at")
 	sortOrder := ctx.DefaultQuery("sort_order", "desc")
@@ -168,9 +168,9 @@ func (c *ProductController) UpdateProductQuantity(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Product quantity updated successfully",
+		"message":    "Product quantity updated successfully",
 		"product_id": id,
-		"quantity": req.Quantity,
+		"quantity":   req.Quantity,
 	})
 }
 

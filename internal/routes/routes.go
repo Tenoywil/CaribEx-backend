@@ -56,7 +56,7 @@ func SetupRoutes(
 		{
 			products.GET("", productController.ListProducts)
 			products.GET("/:id", productController.GetProduct)
-			
+
 			// Protected product routes
 			productsProtected := products.Group("", middleware.AuthMiddleware(authUseCase))
 			{

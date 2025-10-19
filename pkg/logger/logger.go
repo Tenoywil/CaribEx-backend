@@ -16,7 +16,7 @@ type Logger struct {
 func New() *Logger {
 	// Configure zerolog
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	
+
 	// Use console writer for development
 	if os.Getenv("ENV") != "production" {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})

@@ -7,8 +7,8 @@ import (
 
 // Error definitions
 var (
-	ErrProductNotFound     = errors.New("product not found")
-	ErrInvalidQuantity     = errors.New("quantity cannot be negative")
+	ErrProductNotFound = errors.New("product not found")
+	ErrInvalidQuantity = errors.New("quantity cannot be negative")
 )
 
 // Product represents a marketplace product listing

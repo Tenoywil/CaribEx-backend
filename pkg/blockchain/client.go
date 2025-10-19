@@ -17,13 +17,13 @@ func InitRPC(rpcURL string) error {
 	if err != nil {
 		return fmt.Errorf("failed to connect to Ethereum RPC: %w", err)
 	}
-	
+
 	// Test connection
 	_, err = client.ChainID(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to get chain ID from RPC: %w", err)
 	}
-	
+
 	log.Printf("Successfully connected to Ethereum RPC at %s", rpcURL)
 	return nil
 }

@@ -88,7 +88,7 @@ func (c *WalletController) ReceiveFunds(ctx *gin.Context) {
 func (c *WalletController) GetTransactions(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("page_size", "20"))
-	
+
 	// Ensure page and pageSize are within valid ranges
 	if page < 1 {
 		page = 1
