@@ -54,6 +54,8 @@ type Config struct {
 	SupabaseKey        string `mapstructure:"SUPABASE_KEY"`
 	SupabaseBucket     string `mapstructure:"SUPABASE_BUCKET"`
 	StorageMaxFileSize int64  `mapstructure:"STORAGE_MAX_FILE_SIZE"`
+	// Blockchain Configuration
+	RPCURL string `mapstructure:"RPC_URL"`
 
 	// Parsed values
 	AllowedOriginsSlice []string
@@ -140,6 +142,8 @@ func loadEnvFromOS(cfg *Config) {
 	cfg.SupabaseKey = os.Getenv("SUPABASE_KEY")
 	cfg.SupabaseBucket = os.Getenv("SUPABASE_BUCKET")
 	cfg.StorageMaxFileSize = getenvInt64("STORAGE_MAX_FILE_SIZE")
+	// Blockchain Configuration
+	cfg.RPCURL = os.Getenv("RPC_URL")
 
 	// Parse allowed origins into slice
 	cfg.AllowedOriginsSlice = allowedOriginSlice(cfg.AllowedOrigins)

@@ -15,6 +15,7 @@ import (
 	"github.com/Tenoywil/CaribEx-backend/internal/repository/redis"
 	"github.com/Tenoywil/CaribEx-backend/internal/routes"
 	"github.com/Tenoywil/CaribEx-backend/internal/usecase"
+	"github.com/Tenoywil/CaribEx-backend/pkg/blockchain"
 	"github.com/Tenoywil/CaribEx-backend/pkg/config"
 	"github.com/Tenoywil/CaribEx-backend/pkg/logger"
 	"github.com/Tenoywil/CaribEx-backend/pkg/middleware"
@@ -77,6 +78,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Initialize blockchain RPC client (optional - only if RPC_URL is configured)
+	if cfg.RPCURL != "" {
+		if err := blockchain.InitRPC(cfg.RPCURL); err != nil {
+			appLogger.Error(err, "Failed to initialize blockchain RPC client")
+			// Don't exit - blockchain features will be unavailable but app can still run
+		} else {
+			defer blockchain.Close()
+			appLogger.Info("Blockchain RPC client initialized")
+		}
+	} else {
+		appLogger.Info("Blockchain RPC URL not configured - blockchain features disabled")
+	}
+
 	// Initialize repositories
 	sessionRepo := redis.NewSessionRepository(redisClient)
 	userRepo := postgres.NewUserRepository(db)
@@ -105,6 +119,7 @@ func main() {
 	walletUseCase := usecase.NewWalletUseCase(walletRepo)
 	cartUseCase := usecase.NewCartUseCase(cartRepo)
 	orderUseCase := usecase.NewOrderUseCase(orderRepo)
+	blockchainUseCase := usecase.NewBlockchainUseCase(walletRepo)
 
 	// Initialize controllers
 	authController := controller.NewAuthController(authUseCase)
@@ -113,6 +128,7 @@ func main() {
 	walletController := controller.NewWalletController(walletUseCase)
 	cartController := controller.NewCartController(cartUseCase)
 	orderController := controller.NewOrderController(orderUseCase)
+	blockchainController := controller.NewBlockchainController(blockchainUseCase)
 
 	// Set Gin mode
 	if os.Getenv("ENV") == "production" {
@@ -126,7 +142,7 @@ func main() {
 	router.Use(middleware.SetupCORS(cfg.AllowedOriginsSlice))
 
 	// Setup routes
-	routes.SetupRoutes(router, authController, authUseCase, userController, productController, walletController, cartController, orderController)
+	routes.SetupRoutes(router, authController, authUseCase, userController, productController, walletController, cartController, orderController, blockchainController)
 
 	// Start server
 	addr := fmt.Sprintf("%s:%s", cfg.ServerHost, cfg.ServerPort)

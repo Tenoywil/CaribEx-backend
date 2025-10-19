@@ -17,6 +17,7 @@ func SetupRoutes(
 	walletController *controller.WalletController,
 	cartController *controller.CartController,
 	orderController *controller.OrderController,
+	blockchainController *controller.BlockchainController,
 ) {
 	// Health check
 	router.GET("/healthz", func(ctx *gin.Context) {
@@ -77,6 +78,8 @@ func SetupRoutes(
 			wallet.POST("/send", walletController.SendFunds)
 			wallet.POST("/receive", walletController.ReceiveFunds)
 			wallet.GET("/transactions", walletController.GetTransactions)
+			wallet.POST("/verify-transaction", blockchainController.VerifyTransaction)
+			wallet.GET("/transaction-status", blockchainController.GetTransactionStatus)
 		}
 
 		// Cart routes (protected)

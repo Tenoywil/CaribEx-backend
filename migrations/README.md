@@ -4,24 +4,122 @@ This directory contains database migration files for the CaribX backend.
 
 ## Migration Files
 
-### 000001_init_schema
-Initial database schema creation with all tables, indexes, and constraints.
+Migrations are organized by domain to align with the Domain-Driven Design (DDD) architecture.
+
+### 000001_create_users_domain
+Creates the `users` table with proper indexes and update triggers.
 
 **Tables created:**
-- users
-- categories
-- products
-- wallets
-- transactions
-- carts
-- cart_items
-- orders
-- order_items
+- users (with wallet_address, role, etc.)
+
+**Indexes:**
+- idx_users_wallet_address
+- idx_users_role
+
+### 000002_create_auth_domain
+Creates authentication-related tables.
+
+**Tables created:**
 - refresh_tokens
+
+**Indexes:**
+- idx_refresh_tokens_user_id
+- idx_refresh_tokens_token
+- idx_refresh_tokens_expires_at
+
+### 000003_create_categories_domain
+Creates the `categories` table with default product categories.
+
+**Tables created:**
+- categories
 
 **Default categories:** Electronics, Fashion, Home & Garden, Sports & Outdoors, Books & Media, Food & Beverages, Health & Beauty, Toys & Games
 
-### 000002_seed_marketplace_data
+### 000004_create_products_domain
+Creates the `products` table with Row-Level Security (RLS) policies.
+
+**Tables created:**
+- products
+
+**Indexes:**
+- idx_products_seller_id
+- idx_products_category_id
+- idx_products_is_active
+- idx_products_created_at
+
+**RLS Policies:**
+- products_seller_policy: Sellers can only view/modify their own products
+- products_public_view_policy: Anyone can view active products
+- products_admin_policy: Admins have full access
+
+### 000005_create_wallets_domain
+Creates wallet and transaction tables with RLS policies for financial security.
+
+**Tables created:**
+- wallets
+- transactions
+
+**Indexes:**
+- idx_wallets_user_id
+- idx_transactions_wallet_id
+- idx_transactions_status
+- idx_transactions_created_at
+- idx_transactions_type
+
+**RLS Policies:**
+- wallets_user_policy: Users can only access their own wallet
+- wallets_admin_policy: Admins can view all wallets
+- transactions_user_policy: Users can only view their wallet's transactions
+- transactions_user_insert_policy: Users can only create transactions for their wallet
+- transactions_admin_policy: Admins can view all transactions
+
+### 000006_create_carts_domain
+Creates shopping cart tables with RLS policies.
+
+**Tables created:**
+- carts
+- cart_items
+
+**Indexes:**
+- idx_carts_user_id
+- idx_carts_status
+- idx_carts_user_status
+- idx_cart_items_cart_id
+- idx_cart_items_product_id
+
+**RLS Policies:**
+- carts_user_policy: Users can only access their own carts
+- carts_admin_policy: Admins can view all carts
+- cart_items_user_policy: Users can only access items in their carts
+- cart_items_admin_policy: Admins can view all cart items
+
+### 000007_create_orders_domain
+Creates order tables with comprehensive RLS policies.
+
+**Tables created:**
+- orders
+- order_items
+
+**Indexes:**
+- idx_orders_user_id
+- idx_orders_status
+- idx_orders_created_at
+- idx_orders_user_status
+- idx_order_items_order_id
+- idx_order_items_product_id
+
+**RLS Policies:**
+- orders_user_policy: Users can view their own orders
+- orders_user_insert_policy: Users can create orders for themselves
+- orders_user_update_policy: Users can update their pending orders
+- orders_seller_policy: Sellers can view orders containing their products
+- orders_admin_policy: Admins have full access
+- order_items_user_policy: Users can view items in their orders
+- order_items_user_insert_policy: Users can insert items in their orders
+- order_items_seller_policy: Sellers can view items for their products
+- order_items_admin_policy: Admins can view all order items
+
+### 000008_seed_marketplace_data
 Seeds the database with sample marketplace data for development and testing.
 
 **Seeded data includes:**
