@@ -46,6 +46,11 @@ type Transaction struct {
 	Reference string            `json:"reference"`
 	Status    TransactionStatus `json:"status"`
 	CreatedAt time.Time         `json:"created_at"`
+	// Blockchain specific fields
+	TxHash  string `json:"tx_hash,omitempty"`
+	ChainID int64  `json:"chain_id,omitempty"`
+	From    string `json:"from,omitempty"`
+	To      string `json:"to,omitempty"`
 }
 
 // Repository defines the interface for wallet data operations

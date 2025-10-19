@@ -49,6 +49,9 @@ type Config struct {
 	CacheL1TTL     string `mapstructure:"CACHE_L1_TTL"`
 	CacheL2TTL     string `mapstructure:"CACHE_L2_TTL"`
 
+	// Blockchain Configuration
+	RPCURL string `mapstructure:"RPC_URL"`
+
 	// Parsed values
 	AllowedOriginsSlice []string
 }
@@ -128,6 +131,9 @@ func loadEnvFromOS(cfg *Config) {
 	cfg.CacheL1MaxSize = getenvInt64("CACHE_L1_MAX_SIZE")
 	cfg.CacheL1TTL = os.Getenv("CACHE_L1_TTL")
 	cfg.CacheL2TTL = os.Getenv("CACHE_L2_TTL")
+
+	// Blockchain Configuration
+	cfg.RPCURL = os.Getenv("RPC_URL")
 
 	// Parse allowed origins into slice
 	cfg.AllowedOriginsSlice = allowedOriginSlice(cfg.AllowedOrigins)
