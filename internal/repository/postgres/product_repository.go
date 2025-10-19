@@ -235,6 +235,16 @@ func (r *productRepository) Update(p *product.Product) error {
 	return err
 }
 
+func (r *productRepository) UpdateQuantity(id string, quantity int) error {
+	query := `
+		UPDATE products 
+		SET quantity = $1, updated_at = $2
+		WHERE id = $3
+	`
+	_, err := r.db.Exec(context.Background(), query, quantity, "now()", id)
+	return err
+}
+
 func (r *productRepository) Delete(id string) error {
 	query := `DELETE FROM products WHERE id = $1`
 	_, err := r.db.Exec(context.Background(), query, id)

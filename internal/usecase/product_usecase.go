@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Tenoywil/CaribEx-backend/internal/domain/product"
@@ -65,6 +66,22 @@ func (uc *ProductUseCase) ListProductsWithCategory(filters map[string]interface{
 func (uc *ProductUseCase) UpdateProduct(p *product.Product) error {
 	p.UpdatedAt = time.Now()
 	return uc.productRepo.Update(p)
+}
+
+// UpdateProductQuantity updates only the quantity of a product
+func (uc *ProductUseCase) UpdateProductQuantity(id string, quantity int) error {
+	// Validate quantity is not negative
+	if quantity < 0 {
+		return fmt.Errorf("quantity cannot be negative")
+	}
+	
+	// Verify product exists
+	_, err := uc.productRepo.GetByID(id)
+	if err != nil {
+		return fmt.Errorf("product not found: %w", err)
+	}
+	
+	return uc.productRepo.UpdateQuantity(id, quantity)
 }
 
 // DeleteProduct deletes a product

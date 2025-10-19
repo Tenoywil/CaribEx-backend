@@ -136,6 +136,41 @@ func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, p)
 }
 
+// UpdateProductQuantityRequest represents the request body for updating product quantity
+type UpdateProductQuantityRequest struct {
+	Quantity int `json:"quantity" binding:"required,min=0"`
+}
+
+// UpdateProductQuantity handles PATCH /products/:id/quantity
+func (c *ProductController) UpdateProductQuantity(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	var req UpdateProductQuantityRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := c.productUseCase.UpdateProductQuantity(id, req.Quantity)
+	if err != nil {
+		if err.Error() == "product not found" || err.Error() == "failed to get product by id: no rows in result set" {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Get updated product to return
+	p, err := c.productUseCase.GetProductByID(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve updated product"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, p)
+}
+
 // DeleteProduct handles DELETE /products/:id
 func (c *ProductController) DeleteProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
