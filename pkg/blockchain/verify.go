@@ -23,7 +23,7 @@ type TransactionVerification struct {
 // VerifyTransaction validates that a transaction exists, is confirmed, and matches the intended parameters
 func VerifyTransaction(txHash string, expectedChainID int64) (*TransactionVerification, error) {
 	if client == nil {
-		return nil, fmt.Errorf("RPC client not initialized")
+		return nil, fmt.Errorf("RPC client not initialized - please configure RPC_URL environment variable and restart the server")
 	}
 
 	ctx := context.Background()
@@ -95,10 +95,10 @@ func ValidateChainID(chainID int64) bool {
 	// Supported networks: Ethereum Mainnet (1), Sepolia (11155111), etc.
 	supportedChains := map[int64]bool{
 		1:        true, // Ethereum Mainnet
-		11155111: true, // Sepolia
-		5:        true, // Goerli (deprecated but might still be used)
-		137:      true, // Polygon
+		11155111: true, // Sepolia Testnet
+		137:      true, // Polygon Mainnet
 		80001:    true, // Mumbai (Polygon Testnet)
+		// Note: Goerli (5) was removed as it's deprecated and shut down
 	}
 	return supportedChains[chainID]
 }

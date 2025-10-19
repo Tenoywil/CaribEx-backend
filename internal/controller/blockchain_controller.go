@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Tenoywil/CaribEx-backend/internal/usecase"
 	"github.com/gin-gonic/gin"
@@ -82,9 +83,11 @@ func (c *BlockchainController) GetTransactionStatus(ctx *gin.Context) {
 		return
 	}
 
-	chainID := ctx.GetInt64("chainId")
-	if chainID == 0 {
-		chainID = 1 // Default to Ethereum mainnet
+	chainID := int64(1) // Default to Ethereum mainnet
+	if chainIDStr := ctx.Query("chainId"); chainIDStr != "" {
+		if parsed, err := strconv.ParseInt(chainIDStr, 10, 64); err == nil {
+			chainID = parsed
+		}
 	}
 
 	// Get verification details without logging

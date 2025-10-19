@@ -61,12 +61,15 @@ func (uc *BlockchainUseCase) VerifyAndLogTransaction(userID, txHash string, chai
 	// Note: This is a simplified approach. In production, you'd need to map
 	// Ethereum addresses to user wallet addresses properly
 
-	// Create transaction log with value in reference for now
+	// Create transaction log
+	// Note: Amount field set to 0 as blockchain values are stored in wei format in the Value field
+	// and tracked via TxHash. In production, implement proper decimal conversion to match
+	// your wallet's currency (JAM/USD/USDC) or store the raw wei value.
 	tx := &wallet.Transaction{
 		ID:        uuid.New().String(),
 		WalletID:  w.ID,
 		Type:      txType,
-		Amount:    0, // Note: Blockchain value not directly stored in amount field
+		Amount:    0, // Blockchain transaction amount tracked via TxHash and blockchain-specific fields
 		Reference: fmt.Sprintf("Blockchain verification: %s (Value: %s ETH)", txHash, valueEth),
 		Status:    wallet.TransactionStatusSuccess,
 		CreatedAt: time.Now(),

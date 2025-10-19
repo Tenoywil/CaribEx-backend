@@ -14,7 +14,7 @@ func TestValidateChainID(t *testing.T) {
 		{"Sepolia", 11155111, true},
 		{"Polygon", 137, true},
 		{"Mumbai", 80001, true},
-		{"Goerli", 5, true},
+		{"Goerli (deprecated)", 5, false},
 		{"Invalid Chain", 999999, false},
 		{"Zero Chain", 0, false},
 	}

@@ -24,9 +24,10 @@ For testing, you can use:
 The backend validates the following chain IDs:
 - `1` - Ethereum Mainnet
 - `11155111` - Sepolia Testnet
-- `5` - Goerli Testnet (deprecated)
 - `137` - Polygon Mainnet
 - `80001` - Mumbai Testnet (Polygon)
+
+**Note:** Goerli testnet has been deprecated and is no longer supported.
 
 ## API Endpoints
 

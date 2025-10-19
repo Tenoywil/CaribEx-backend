@@ -222,7 +222,6 @@ Check the status of a blockchain transaction without logging it.
 **Supported Chain IDs**:
 - `1` - Ethereum Mainnet
 - `11155111` - Sepolia Testnet
-- `5` - Goerli Testnet
 - `137` - Polygon Mainnet
 - `80001` - Mumbai Testnet
 
