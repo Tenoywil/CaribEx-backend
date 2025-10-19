@@ -5,6 +5,7 @@ import (
 
 	"github.com/Tenoywil/CaribEx-backend/internal/usecase"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 // AuthController handles authentication HTTP requests
@@ -68,6 +69,7 @@ func (c *AuthController) AuthenticateSIWE(ctx *gin.Context) {
 		req.Signature,
 	)
 	if err != nil {
+		log.Error().Err(err).Msg("SIWE verification failed")
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "authentication failed: " + err.Error()})
 		return
 	}

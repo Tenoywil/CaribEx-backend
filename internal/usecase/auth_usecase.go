@@ -8,8 +8,8 @@ import (
 
 	"github.com/Tenoywil/CaribEx-backend/internal/domain/auth"
 	"github.com/Tenoywil/CaribEx-backend/internal/domain/user"
+	"github.com/Tenoywil/CaribEx-backend/pkg/siwe"
 	"github.com/rs/zerolog/log"
-	"github.com/spruceid/siwe-go"
 )
 
 // AuthUseCase handles authentication business logic
@@ -35,13 +35,12 @@ func NewAuthUseCase(
 // GenerateNonce creates a new nonce for SIWE authentication
 func (uc *AuthUseCase) GenerateNonce(ctx context.Context) (*auth.Nonce, error) {
 	nonce := auth.NewNonce()
-	
+
 	if err := uc.sessionRepo.SaveNonce(ctx, nonce); err != nil {
 		log.Error().Err(err).Msg("failed to save nonce")
 		return nil, fmt.Errorf("failed to generate nonce: %w", err)
 	}
 
-	log.Info().Str("nonce", nonce.Value).Msg("nonce generated")
 	return nonce, nil
 }
 
@@ -50,38 +49,22 @@ func (uc *AuthUseCase) VerifySIWE(
 	ctx context.Context,
 	message, signature string,
 ) (*auth.Session, *user.User, error) {
-	// Log the received message for debugging
-	log.Debug().Str("message", message).Str("signature", signature).Msg("received SIWE authentication request")
-	
-	// Parse the SIWE message
-	siweMessage, err := siwe.ParseMessage(message)
+	// Use our custom SIWE verification
+	siweMessage, err := siwe.VerifySIWE(message, signature, uc.domain)
 	if err != nil {
-		log.Error().Err(err).Str("message", message).Msg("failed to parse SIWE message")
-		return nil, nil, fmt.Errorf("invalid SIWE message: %w", err)
-	}
-
-	// Verify the domain matches
-	if siweMessage.GetDomain() != uc.domain {
-		return nil, nil, fmt.Errorf("domain mismatch: expected %s, got %s", uc.domain, siweMessage.GetDomain())
+		log.Error().Err(err).Msg("SIWE verification failed")
+		return nil, nil, fmt.Errorf("SIWE verification failed: %w", err)
 	}
 
 	// Verify the nonce exists and is valid
-	nonce, err := uc.sessionRepo.GetNonce(ctx, siweMessage.GetNonce())
+	nonce, err := uc.sessionRepo.GetNonce(ctx, siweMessage.Nonce)
 	if err != nil {
-		log.Error().Err(err).Str("nonce", siweMessage.GetNonce()).Msg("nonce not found or expired")
+		log.Error().Err(err).Str("nonce", siweMessage.Nonce).Msg("nonce not found or expired")
 		return nil, nil, fmt.Errorf("invalid or expired nonce")
 	}
 
-	// Verify the signature
-	_, err = siweMessage.VerifyEIP191(signature)
-	if err != nil {
-		log.Error().Err(err).Msg("signature verification failed")
-		return nil, nil, fmt.Errorf("invalid signature: %w", err)
-	}
-
-	// Get the wallet address from the message
-	// Note: VerifyEIP191 already validates that the signature matches the address
-	walletAddress := strings.ToLower(siweMessage.GetAddress().Hex())
+	// Get the wallet address from the message (already verified by signature check)
+	walletAddress := strings.ToLower(siweMessage.Address)
 
 	// Delete the used nonce
 	if err := uc.sessionRepo.DeleteNonce(ctx, nonce.Value); err != nil {
