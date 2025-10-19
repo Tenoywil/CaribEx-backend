@@ -88,6 +88,17 @@ func (c *WalletController) ReceiveFunds(ctx *gin.Context) {
 func (c *WalletController) GetTransactions(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("page_size", "20"))
+	
+	// Ensure page and pageSize are within valid ranges
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 20
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
 
 	// TODO: Get wallet ID from authenticated user context
 	walletID := ctx.GetString("wallet_id")

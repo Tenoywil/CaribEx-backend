@@ -256,7 +256,7 @@ MIT License - See [LICENSE](LICENSE) file.
 
 ## Maintainer
 
-Tenoy Williams - [@Tenoywil](https://github.com/Tenoywil)
+Tenoy Wilson - [@Tenoywil](https://github.com/Tenoywil)
 
 ---
 

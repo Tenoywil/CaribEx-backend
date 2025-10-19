@@ -19,6 +19,7 @@ import (
 	"github.com/Tenoywil/CaribEx-backend/pkg/config"
 	"github.com/Tenoywil/CaribEx-backend/pkg/logger"
 	"github.com/Tenoywil/CaribEx-backend/pkg/middleware"
+	"github.com/Tenoywil/CaribEx-backend/pkg/storage"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	redisclient "github.com/redis/go-redis/v9"
@@ -98,6 +99,19 @@ func main() {
 	cartRepo := postgres.NewCartRepository(db)
 	orderRepo := postgres.NewOrderRepository(db)
 
+	// Initialize storage service
+	storageService, err := storage.NewSupabaseStorage(storage.Config{
+		URL:         cfg.SupabaseURL,
+		Key:         cfg.SupabaseKey,
+		Bucket:      cfg.SupabaseBucket,
+		MaxFileSize: cfg.StorageMaxFileSize,
+	})
+	if err != nil {
+		appLogger.Error(err, "Failed to initialize storage service")
+		os.Exit(1)
+	}
+	appLogger.Info("Storage service initialized")
+
 	// Initialize use cases
 	userUseCase := usecase.NewUserUseCase(userRepo)
 	authUseCase := usecase.NewAuthUseCase(sessionRepo, userUseCase, cfg.SIWEDomain)
@@ -110,7 +124,7 @@ func main() {
 	// Initialize controllers
 	authController := controller.NewAuthController(authUseCase)
 	userController := controller.NewUserController(userUseCase)
-	productController := controller.NewProductController(productUseCase)
+	productController := controller.NewProductController(productUseCase, storageService)
 	walletController := controller.NewWalletController(walletUseCase)
 	cartController := controller.NewCartController(cartUseCase)
 	orderController := controller.NewOrderController(orderUseCase)
