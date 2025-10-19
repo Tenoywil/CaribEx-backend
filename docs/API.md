@@ -142,7 +142,11 @@ Retrieve wallet transaction ledger.
       "amount": 100.00,
       "reference": "Deposit",
       "status": "success",
-      "created_at": "2025-10-18T12:00:00Z"
+      "created_at": "2025-10-18T12:00:00Z",
+      "tx_hash": "0xabc...",
+      "chain_id": 1,
+      "from": "0x123...",
+      "to": "0x456..."
     }
   ],
   "total": 50,
@@ -150,6 +154,77 @@ Retrieve wallet transaction ledger.
   "page_size": 20
 }
 ```
+
+### Verify Blockchain Transaction
+
+Verify an on-chain transaction and log it to the database. This endpoint ensures the transaction has been confirmed on the blockchain before processing.
+
+**Endpoint**: `POST /v1/wallet/verify-transaction`
+
+**Headers**: `Cookie: session=...`
+
+**Request Body**:
+```json
+{
+  "txHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "chainId": 1
+}
+```
+
+**Response**:
+```json
+{
+  "status": "verified",
+  "txHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "message": "Transaction successfully verified",
+  "from": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1",
+  "to": "0x1234567890123456789012345678901234567890",
+  "chainId": 1
+}
+```
+
+**Error Response**:
+```json
+{
+  "status": "failed",
+  "txHash": "0xabc...",
+  "error": "transaction is still pending",
+  "message": "Transaction verification failed"
+}
+```
+
+### Get Transaction Status
+
+Check the status of a blockchain transaction without logging it.
+
+**Endpoint**: `GET /v1/wallet/transaction-status?txHash=0xabc...&chainId=1`
+
+**Headers**: `Cookie: session=...`
+
+**Query Parameters**:
+- `txHash` (required): The transaction hash to check
+- `chainId` (optional): The chain ID (default: 1)
+
+**Response**:
+```json
+{
+  "status": "success",
+  "txHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "message": "Transaction status retrieved",
+  "from": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1",
+  "to": "0x1234567890123456789012345678901234567890",
+  "value": "1000000000000000000",
+  "chainId": 1,
+  "isPending": false
+}
+```
+
+**Supported Chain IDs**:
+- `1` - Ethereum Mainnet
+- `11155111` - Sepolia Testnet
+- `5` - Goerli Testnet
+- `137` - Polygon Mainnet
+- `80001` - Mumbai Testnet
 
 ---
 
