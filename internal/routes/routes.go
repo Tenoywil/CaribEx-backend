@@ -60,6 +60,8 @@ func SetupRoutes(
 			productsProtected := products.Group("", middleware.AuthMiddleware(authUseCase))
 			{
 				productsProtected.POST("", productController.CreateProduct)
+				productsProtected.POST("/multipart", productController.CreateProductMultipart)
+				productsProtected.POST("/upload-image", productController.UploadImage)
 				productsProtected.PUT("/:id", productController.UpdateProduct)
 				productsProtected.DELETE("/:id", productController.DeleteProduct)
 			}
