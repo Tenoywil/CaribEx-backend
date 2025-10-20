@@ -22,9 +22,9 @@ type Service interface {
 
 // SupabaseStorage implements the Service interface using Supabase Storage
 type SupabaseStorage struct {
-	client     *storagego.Client
-	bucket     string
-	baseURL    string
+	client      *storagego.Client
+	bucket      string
+	baseURL     string
 	maxFileSize int64
 }
 

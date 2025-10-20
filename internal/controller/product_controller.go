@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/Tenoywil/CaribEx-backend/internal/domain/product"
 	"github.com/Tenoywil/CaribEx-backend/internal/usecase"
 	"github.com/Tenoywil/CaribEx-backend/pkg/storage"
 	"github.com/gin-gonic/gin"
@@ -70,7 +72,7 @@ func (c *ProductController) GetProduct(ctx *gin.Context) {
 func (c *ProductController) ListProducts(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("page_size", "20"))
-	
+
 	// Ensure page and pageSize are within valid ranges
 	if page < 1 {
 		page = 1
@@ -89,7 +91,7 @@ func (c *ProductController) ListProducts(ctx *gin.Context) {
 	if search := ctx.Query("search"); search != "" {
 		filters["search"] = search
 	}
-	
+
 	// Get sort parameters
 	sortBy := ctx.DefaultQuery("sort_by", "created_at")
 	sortOrder := ctx.DefaultQuery("sort_order", "desc")
@@ -134,6 +136,42 @@ func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, p)
+}
+
+// UpdateProductQuantityRequest represents the request body for updating product quantity
+type UpdateProductQuantityRequest struct {
+	Quantity int `json:"quantity" binding:"required,min=0"`
+}
+
+// UpdateProductQuantity handles PATCH /products/:id/quantity
+func (c *ProductController) UpdateProductQuantity(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	var req UpdateProductQuantityRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := c.productUseCase.UpdateProductQuantity(id, req.Quantity)
+	if err != nil {
+		if errors.Is(err, product.ErrProductNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
+			return
+		}
+		if errors.Is(err, product.ErrInvalidQuantity) {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message":    "Product quantity updated successfully",
+		"product_id": id,
+		"quantity":   req.Quantity,
+	})
 }
 
 // DeleteProduct handles DELETE /products/:id

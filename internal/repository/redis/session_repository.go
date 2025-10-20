@@ -29,7 +29,7 @@ func (r *SessionRepository) SaveSession(ctx context.Context, session *auth.Sessi
 
 	key := fmt.Sprintf("session:%s", session.ID)
 	ttl := time.Until(session.ExpiresAt)
-	
+
 	if err := r.client.Set(ctx, key, data, ttl).Err(); err != nil {
 		return fmt.Errorf("failed to save session: %w", err)
 	}
@@ -40,7 +40,7 @@ func (r *SessionRepository) SaveSession(ctx context.Context, session *auth.Sessi
 // GetSession retrieves a session from Redis
 func (r *SessionRepository) GetSession(ctx context.Context, sessionID string) (*auth.Session, error) {
 	key := fmt.Sprintf("session:%s", sessionID)
-	
+
 	data, err := r.client.Get(ctx, key).Bytes()
 	if err == redis.Nil {
 		return nil, fmt.Errorf("session not found")
@@ -66,7 +66,7 @@ func (r *SessionRepository) GetSession(ctx context.Context, sessionID string) (*
 // DeleteSession removes a session from Redis
 func (r *SessionRepository) DeleteSession(ctx context.Context, sessionID string) error {
 	key := fmt.Sprintf("session:%s", sessionID)
-	
+
 	if err := r.client.Del(ctx, key).Err(); err != nil {
 		return fmt.Errorf("failed to delete session: %w", err)
 	}
@@ -83,7 +83,7 @@ func (r *SessionRepository) SaveNonce(ctx context.Context, nonce *auth.Nonce) er
 
 	key := fmt.Sprintf("nonce:%s", nonce.Value)
 	ttl := time.Until(nonce.ExpiresAt)
-	
+
 	if err := r.client.Set(ctx, key, data, ttl).Err(); err != nil {
 		return fmt.Errorf("failed to save nonce: %w", err)
 	}
@@ -94,7 +94,7 @@ func (r *SessionRepository) SaveNonce(ctx context.Context, nonce *auth.Nonce) er
 // GetNonce retrieves a nonce from Redis
 func (r *SessionRepository) GetNonce(ctx context.Context, nonceValue string) (*auth.Nonce, error) {
 	key := fmt.Sprintf("nonce:%s", nonceValue)
-	
+
 	data, err := r.client.Get(ctx, key).Bytes()
 	if err == redis.Nil {
 		return nil, fmt.Errorf("nonce not found")
@@ -120,7 +120,7 @@ func (r *SessionRepository) GetNonce(ctx context.Context, nonceValue string) (*a
 // DeleteNonce removes a nonce from Redis
 func (r *SessionRepository) DeleteNonce(ctx context.Context, nonceValue string) error {
 	key := fmt.Sprintf("nonce:%s", nonceValue)
-	
+
 	if err := r.client.Del(ctx, key).Err(); err != nil {
 		return fmt.Errorf("failed to delete nonce: %w", err)
 	}

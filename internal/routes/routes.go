@@ -56,7 +56,7 @@ func SetupRoutes(
 		{
 			products.GET("", productController.ListProducts)
 			products.GET("/:id", productController.GetProduct)
-			
+
 			// Protected product routes
 			productsProtected := products.Group("", middleware.AuthMiddleware(authUseCase))
 			{
@@ -64,6 +64,7 @@ func SetupRoutes(
 				productsProtected.POST("/multipart", productController.CreateProductMultipart)
 				productsProtected.POST("/upload-image", productController.UploadImage)
 				productsProtected.PUT("/:id", productController.UpdateProduct)
+				productsProtected.PATCH("/:id/quantity", productController.UpdateProductQuantity)
 				productsProtected.DELETE("/:id", productController.DeleteProduct)
 			}
 		}

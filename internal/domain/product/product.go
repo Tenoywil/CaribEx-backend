@@ -1,6 +1,15 @@
 package product
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+// Error definitions
+var (
+	ErrProductNotFound = errors.New("product not found")
+	ErrInvalidQuantity = errors.New("quantity cannot be negative")
+)
 
 // Product represents a marketplace product listing
 type Product struct {
@@ -47,6 +56,7 @@ type Repository interface {
 	List(filters map[string]interface{}, page, pageSize int) ([]*Product, int, error)
 	ListWithCategory(filters map[string]interface{}, page, pageSize int, sortBy, sortOrder string) ([]*ProductWithCategory, int, error)
 	Update(product *Product) error
+	UpdateQuantity(id string, quantity int) error
 	Delete(id string) error
 	GetCategories() ([]*Category, error)
 }

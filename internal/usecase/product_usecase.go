@@ -67,6 +67,22 @@ func (uc *ProductUseCase) UpdateProduct(p *product.Product) error {
 	return uc.productRepo.Update(p)
 }
 
+// UpdateProductQuantity updates only the quantity of a product
+func (uc *ProductUseCase) UpdateProductQuantity(id string, quantity int) error {
+	// Validate quantity is not negative
+	if quantity < 0 {
+		return product.ErrInvalidQuantity
+	}
+
+	// Verify product exists
+	_, err := uc.productRepo.GetByID(id)
+	if err != nil {
+		return product.ErrProductNotFound
+	}
+
+	return uc.productRepo.UpdateQuantity(id, quantity)
+}
+
 // DeleteProduct deletes a product
 func (uc *ProductUseCase) DeleteProduct(id string) error {
 	return uc.productRepo.Delete(id)
